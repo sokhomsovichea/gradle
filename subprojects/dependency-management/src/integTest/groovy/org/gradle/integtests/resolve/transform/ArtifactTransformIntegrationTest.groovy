@@ -934,16 +934,23 @@ $fileSizer
         fails "resolve"
 
         then:
-        failure.assertHasCause """Found multiple transforms that can produce a variant of project :lib for consumer attributes:
+        failure.assertHasCause """Found multiple transforms that can produce a variant of project :lib with requested attributes:
   - artifactType 'transformed'
   - usage 'api'
 Found the following transforms:
-  - Transform from configuration ':lib:compile':
-      - artifactType 'custom'
-      - usage 'api'
-  - Transform from configuration ':lib:compile':
-      - artifactType 'custom'
-      - usage 'api'"""
+  - From variant 'configuration ':lib:compile'':
+      - With source attributes:
+          - artifactType 'custom'
+          - usage 'api'
+      - Candidate transformation(s):
+          - Transformation 'BrokenTransform' producing attributes:
+              - artifactType 'transformed'
+              - extra 'bar'
+              - usage 'api'
+          - Transformation 'BrokenTransform' producing attributes:
+              - artifactType 'transformed'
+              - extra 'baz'
+              - usage 'api'"""
     }
 
     def "user receives reasonable error message when multiple variants can be transformed to produce requested variant"() {
@@ -1024,24 +1031,44 @@ Found the following transforms:
         fails "resolve"
 
         then:
-        failure.assertHasCause """Found multiple transforms that can produce a variant of project :lib for consumer attributes:
+        failure.assertHasCause """Found multiple transforms that can produce a variant of project :lib with requested attributes:
   - artifactType 'transformed'
   - usage 'api'
 Found the following transforms:
-  - Transform from configuration ':lib:compile' variant variant1:
-      - artifactType 'jar'
-      - buildType 'release'
-      - flavor 'free'
-      - usage 'api'
-  - Transform from configuration ':lib:compile' variant variant2:
-      - artifactType 'jar'
-      - buildType 'release'
-      - flavor 'paid'
-      - usage 'api'
-  - Transform from configuration ':lib:compile' variant variant3:
-      - artifactType 'jar'
-      - buildType 'debug'
-      - usage 'api'"""
+  - From variant 'configuration ':lib:compile' variant variant1':
+      - With source attributes:
+          - artifactType 'jar'
+          - buildType 'release'
+          - flavor 'free'
+          - usage 'api'
+      - Candidate transformation(s):
+          - Transformation 'BrokenTransform' producing attributes:
+              - artifactType 'transformed'
+              - buildType 'release'
+              - flavor 'free'
+              - usage 'api'
+  - From variant 'configuration ':lib:compile' variant variant2':
+      - With source attributes:
+          - artifactType 'jar'
+          - buildType 'release'
+          - flavor 'paid'
+          - usage 'api'
+      - Candidate transformation(s):
+          - Transformation 'BrokenTransform' producing attributes:
+              - artifactType 'transformed'
+              - buildType 'release'
+              - flavor 'paid'
+              - usage 'api'
+  - From variant 'configuration ':lib:compile' variant variant3':
+      - With source attributes:
+          - artifactType 'jar'
+          - buildType 'debug'
+          - usage 'api'
+      - Candidate transformation(s):
+          - Transformation 'BrokenTransform' producing attributes:
+              - artifactType 'transformed'
+              - buildType 'debug'
+              - usage 'api'"""
     }
 
     def "result is applied for all query methods"() {
