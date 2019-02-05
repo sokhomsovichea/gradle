@@ -143,11 +143,17 @@ public class ValidateTaskProperties extends ConventionTask implements Verificati
         final Map<String, Boolean> taskValidationProblems = Maps.newTreeMap();
         final Class<?> taskInterface;
         final Method validatorMethod;
+        final Object validator;
         try {
             taskInterface = classLoader.loadClass(Task.class.getName());
             Class<?> validatorClass = classLoader.loadClass("org.gradle.api.internal.tasks.properties.PropertyValidationAccess");
-            validatorMethod = validatorClass.getMethod("collectTaskValidationProblems", Class.class, Map.class, Boolean.TYPE);
+            validator = validatorClass.newInstance();
+            validatorMethod = validatorClass.getMethod("collectValidationProblems", Class.class, Map.class, Boolean.TYPE);
+        } catch (InstantiationException e) {
+            throw new RuntimeException(e.getCause());
         } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
@@ -189,7 +195,7 @@ public class ValidateTaskProperties extends ConventionTask implements Verificati
                     }
                     Class<? extends Task> taskClass = Cast.uncheckedCast(clazz);
                     try {
-                        validatorMethod.invoke(null, taskClass, taskValidationProblems, enableStricterValidation);
+                        validatorMethod.invoke(validator, taskClass, taskValidationProblems, enableStricterValidation);
                     } catch (IllegalAccessException e) {
                         throw new RuntimeException(e);
                     } catch (InvocationTargetException e) {

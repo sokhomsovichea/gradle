@@ -61,8 +61,15 @@ public class PropertyValidationAccess {
         InputDirectory.class, new MissingPathSensitivityValidator()
     );
 
+    public PropertyValidationAccess() {
+    }
+
     @SuppressWarnings("unused")
     public static void collectTaskValidationProblems(Class<?> topLevelBean, Map<String, Boolean> problems, boolean enableStricterValidation) {
+        new PropertyValidationAccess().collectValidationProblems(topLevelBean, problems, enableStricterValidation);
+    }
+
+    public void collectValidationProblems(Class<?> topLevelBean, Map<String, Boolean> problems, boolean enableStricterValidation) {
         DefaultCrossBuildInMemoryCacheFactory cacheFactory = new DefaultCrossBuildInMemoryCacheFactory(new DefaultListenerManager());
         DefaultTaskClassInfoStore taskClassInfoStore = new DefaultTaskClassInfoStore(cacheFactory);
         TypeMetadataStore metadataStore = new DefaultTypeMetadataStore(ImmutableList.of(
